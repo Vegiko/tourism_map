@@ -1,0 +1,117 @@
+// ╔══════════════════════════════════════════════════════════════╗
+// ║  firestore.rules  –  Copy to Firebase Console               ║
+// ║  Firebase Console → Firestore → Rules                       ║
+// ╚══════════════════════════════════════════════════════════════╝
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helper Functions ────────────────────────────────────────
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function isPartner() {
+      return isAuthenticated() && getUserData().role == 'partner';
+    }
+
+    function isTraveler() {
+      return isAuthenticated() && getUserData().role == 'traveler';
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && getUserData().role == 'admin';
+    }
+
+    // ── Users Collection ─────────────────────────────────────────
+    match /users/{userId} {
+      // Anyone can read their own profile
+      allow read: if isOwner(userId);
+
+      // Only the user can create their own document
+      allow create: if isOwner(userId)
+        && request.resource.data.keys().hasAll(['uid', 'email', 'role', 'display_name', 'created_at'])
+        && request.resource.data.role in ['traveler', 'partner'];
+
+      // Only the user can update their own document
+      // They cannot change uid, email, or role
+      allow update: if isOwner(userId)
+        && !request.resource.data.diff(resource.data).affectedKeys()
+            .hasAny(['uid', 'email', 'role', 'created_at']);
+
+      // Only the user or admin can delete
+      allow delete: if isOwner(userId) || isAdmin();
+    }
+
+    // ── Destinations Collection ──────────────────────────────────
+    match /destinations/{destinationId} {
+      // Anyone (even unauthenticated) can read destinations
+      allow read: if true;
+
+      // Only verified partners can create destinations
+      allow create: if isPartner()
+        && getUserData().partner_info.is_verified == true;
+
+      // Only the owner partner can update
+      allow update: if isPartner()
+        && resource.data.owner_uid == request.auth.uid;
+
+      // Only the owner partner or admin can delete
+      allow delete: if (isPartner() && resource.data.owner_uid == request.auth.uid)
+        || isAdmin();
+    }
+
+    // ── Bookings Collection ──────────────────────────────────────
+    match /bookings/{bookingId} {
+      // Traveler can read their own bookings
+      // Partner can read bookings for their business
+      allow read: if isAuthenticated()
+        && (resource.data.traveler_uid == request.auth.uid
+            || resource.data.partner_uid == request.auth.uid);
+
+      // Only travelers can create bookings
+      allow create: if isTraveler()
+        && request.resource.data.traveler_uid == request.auth.uid;
+
+      // Both traveler (cancel) and partner (confirm/reject) can update
+      allow update: if isAuthenticated()
+        && (resource.data.traveler_uid == request.auth.uid
+            || resource.data.partner_uid == request.auth.uid);
+
+      // Only admin can delete bookings
+      allow delete: if isAdmin();
+    }
+
+    // ── Reviews Collection ───────────────────────────────────────
+    match /reviews/{reviewId} {
+      // Anyone can read reviews
+      allow read: if true;
+
+      // Only travelers who completed the booking can write
+      allow create: if isTraveler()
+        && request.resource.data.author_uid == request.auth.uid;
+
+      // Only the author can update their review
+      allow update: if isAuthenticated()
+        && resource.data.author_uid == request.auth.uid;
+
+      // Author or admin can delete
+      allow delete: if (isAuthenticated() && resource.data.author_uid == request.auth.uid)
+        || isAdmin();
+    }
+
+    // ── Default: Deny all other access ──────────────────────────
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
