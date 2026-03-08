@@ -24,7 +24,10 @@ jobs:
           
       - name: Get dependencies
         run: flutter pub get
-        
+
+      - name: Clean Project
+        run: flutter clean
+
       - name: Build APK
         run: flutter build apk --release
 
@@ -33,6 +36,7 @@ jobs:
         with:
           name: release-apk
           path: build/app/outputs/flutter-apk/app-release.apk
+
 
 
 
