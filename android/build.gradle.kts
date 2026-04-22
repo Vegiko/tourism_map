@@ -1,7 +1,7 @@
 plugins {
     id("com.android.application") apply false
     id("com.android.library") apply false
-    id("org.jetbrains.kotlin.android") apply false
+    id("org.jetbrains.kotlin.android") version "2.0.0"  apply false
 }
 allprojects {
     repositories {
@@ -26,4 +26,13 @@ subprojects {
 
 tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
+}
+subprojects {
+    configurations.all {
+        resolutionStrategy.eachDependency {
+            if (requested.group == "org.jetbrains.kotlin") {
+                useVersion("2.0.0")
+            }
+        }
+    }
 }
