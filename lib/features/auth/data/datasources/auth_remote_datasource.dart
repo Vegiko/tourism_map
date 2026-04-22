@@ -220,3 +220,48 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     await _firebaseAuth.currentUser?.delete();
   }
 }
+
+// ════════════════════════════════════════════════════════════
+//  MockAuthRemoteDataSource
+//  يُستخدم عندما لا يكون Firebase مُهيّأً بعد
+//  يُصدر null فوراً → AuthBloc يُصدر Unauthenticated → الانتقال لصفحة الدخول
+// ════════════════════════════════════════════════════════════
+class MockAuthRemoteDataSource implements AuthRemoteDataSource {
+  @override
+  Stream<User?> get firebaseAuthStateChanges =>
+      Stream.value(null); // يُصدر "غير مسجل دخول" فوراً
+
+  @override
+  User? get currentFirebaseUser => null;
+
+  @override
+  Future<AppUserModel> signInWithEmailAndPassword(String email, String password) =>
+      throw UnimplementedError('Firebase غير مُهيّأ. شغّل: flutterfire configure');
+
+  @override
+  Future<AppUserModel> createUserWithEmailAndPassword({
+    required String email, required String password,
+    required String displayName, required UserRole role, PartnerInfo? partnerInfo,
+  }) => throw UnimplementedError('Firebase غير مُهيّأ');
+
+  @override
+  Future<void> signOut() async {}
+
+  @override
+  Future<void> sendEmailVerification() async {}
+
+  @override
+  Future<void> sendPasswordResetEmail(String email) async {}
+
+  @override
+  Future<AppUserModel> getUserProfile(String uid) =>
+      throw UnimplementedError('Firebase غير مُهيّأ');
+
+  @override
+  Future<AppUserModel> updateUserProfile({
+    required String uid, String? displayName, String? photoUrl, PartnerInfo? partnerInfo,
+  }) => throw UnimplementedError('Firebase غير مُهيّأ');
+
+  @override
+  Future<void> deleteAccount() async {}
+}
