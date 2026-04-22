@@ -1,7 +1,7 @@
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android") // تأكد أنه بهذا الاسم وليس "kotlin-android"
-    id("dev.flutter.flutter-gradle-plugin")
+    id("com.android.application") version "8.1.1" apply false
+    id("com.android.library") version "8.1.1" apply false
+    id("org.jetbrains.kotlin.android") version "2.0.0" apply false 
 }
 allprojects {
     repositories {
