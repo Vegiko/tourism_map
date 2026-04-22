@@ -195,11 +195,11 @@ class AppRouterProvider extends StatelessWidget {
 
   // ── Transition Builders ──────────────────────
   static Widget _fadeSlideTransition(
-      BuildContext context,
-      Animation<double> animation,
-      Animation<double> secondaryAnimation,
-      Widget child,
-      ) {
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
     return FadeTransition(
       opacity: animation,
       child: SlideTransition(
@@ -215,11 +215,11 @@ class AppRouterProvider extends StatelessWidget {
   }
 
   static Widget _fadeTransition(
-      BuildContext context,
-      Animation<double> animation,
-      Animation<double> secondaryAnimation,
-      Widget child,
-      ) {
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
     return FadeTransition(opacity: animation, child: child);
   }
 
@@ -273,6 +273,16 @@ class _AuthSplashScreenState extends State<_AuthSplashScreen>
     );
 
     _ctrl.forward();
+
+    // ── Timeout fallback ──────────────────────────
+    // إذا لم يستجب Firebase خلال 5 ثوانٍ، انتقل لصفحة الدخول
+    Future.delayed(const Duration(seconds: 5), () {
+      if (!mounted) return;
+      final authState = context.read<AuthBloc>().state;
+      if (authState is AuthInitial || authState is AuthLoading) {
+        context.go(AppRoutes.roleSelection);
+      }
+    });
   }
 
   @override
