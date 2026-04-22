@@ -1,7 +1,7 @@
 plugins {
     id("com.android.application") apply false
     id("com.android.library") apply false
-    id("org.jetbrains.kotlin.android") version "2.0.0"  apply false
+    id("org.jetbrains.kotlin.android") version "2.1.0"  apply false
 }
 allprojects {
     repositories {
