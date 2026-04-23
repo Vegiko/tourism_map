@@ -144,7 +144,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     emit(const AuthLoading(message: 'جاري تسجيل الدخول بـ Google...'));
-    final result = await signInWithGoogle();
+    final result = await signInWithGoogle(const NoParams());
     result.fold(
       (failure) => emit(AuthError(failure.message)),
       (user) => emit(Authenticated(user)),
@@ -156,7 +156,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     emit(const AuthLoading(message: 'جاري تسجيل الخروج...'));
-    final result = await signOut();
+    final result = await signOut(const NoParams());
     result.fold(
       (failure) => emit(AuthError(failure.message)),
       (_) => emit(const Unauthenticated()),
