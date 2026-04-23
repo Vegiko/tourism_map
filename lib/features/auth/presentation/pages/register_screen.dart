@@ -129,6 +129,24 @@ class _RegisterScreenState extends State<RegisterScreen>
                 ),
               );
             }
+             if (state is Authenticated) {
+          Navigator.of(context).pushReplacementNamed('/home'); 
+        }
+
+        if (state is RegistrationSuccess) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.message, style: const TextStyle(fontFamily: 'Cairo')),
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+              duration: const Duration(seconds: 5),
+            ),
+          );
+          // الانتقال لصفحة تسجيل الدخول بعد ظهور الرسالة
+          Future.delayed(const Duration(seconds: 2), () {
+            widget.onNavigateToLogin();
+          });
+        }
           },
           builder: (context, state) {
             final isLoading = state is AuthLoading;
