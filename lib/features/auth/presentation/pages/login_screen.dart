@@ -84,6 +84,20 @@ class _LoginScreenState extends State<LoginScreen>
                 ),
               );
             }
+                 if (state is Authenticated) {
+        Navigator.of(context).pushReplacementNamed('/home'); 
+      }
+
+      if (state is RegistrationSuccess) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(state.message, style: const TextStyle(fontFamily: 'Cairo')),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+        );
+      }
           },
           builder: (context, state) {
             final isLoading = state is AuthLoading;
@@ -196,7 +210,28 @@ class _LoginScreenState extends State<LoginScreen>
                                           const SignInWithGoogleRequested(),
                                         ),
                               ),
-                              const SizedBox(height: 32),
+                                          const SizedBox(height: 16), // مسافة بين زر جوجل وزر الضيف
+
+            OutlinedButton(
+              style: OutlinedButton.styleFrom(
+                minimumSize: const Size(double.infinity, 56),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                side: BorderSide(color: AppColors.primary.withOpacity(0.4)),
+              ),
+              onPressed: isLoading 
+                ? null 
+                : () => context.read<AuthBloc>().add(const GuestSignInRequested()),
+              child: const Text(
+                'المتابعة كضيف',
+                style: TextStyle(
+                  fontFamily: 'Cairo',
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.primary,
+                ),
+              ),
+            ),
+                              const SizedBox(height: 16),
 
                               // Register Link
                               _buildRegisterLink(),
