@@ -90,9 +90,13 @@ class AppRouterProvider extends StatelessWidget {
               : AppRoutes.travelerHome;
         }
 
-        // Unauthenticated - allow access to auth pages
+        // Unauthenticated - redirect to role selection
+        // (لا تسمح بالبقاء على Splash)
+        if (path == AppRoutes.splash) {
+          return AppRoutes.roleSelection;
+        }
+        
         final authPages = [
-          AppRoutes.splash,
           AppRoutes.roleSelection,
           AppRoutes.login,
           AppRoutes.register,
