@@ -64,7 +64,25 @@ class SignOut implements UseCase<Unit, NoParams> {
     return await repository.signOut();
   }
 }
+class SendPasswordReset implements UseCase<Unit, SendPasswordResetParams> {
+  final AuthRepository repository;
+  SendPasswordReset(this.repository);
 
+  @override
+  Future<Either<AuthFailure, Unit>> call(SendPasswordResetParams params) async {
+    return await repository.sendPasswordResetEmail(email: params.email);
+  }
+}
+
+class GetUserProfile implements UseCase<AppUser, String> {
+  final AuthRepository repository;
+  GetUserProfile(this.repository);
+
+  @override
+  Future<Either<AuthFailure, AppUser>> call(String uid) async {
+    return await repository.getUserProfile(uid);
+  }
+}
 // ──────────────────────────────────────────────
 // 3. حالة خاصة للـ Streams (مراقبة حالة المستخدم)
 // ──────────────────────────────────────────────
@@ -99,4 +117,8 @@ class RegisterWithEmailParams {
     required this.role,
     this.partnerInfo,
   });
+}
+class SendPasswordResetParams {
+  final String email;
+  const SendPasswordResetParams({required this.email});
 }
