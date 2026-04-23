@@ -44,17 +44,19 @@ Future<void> initDependencies({bool firebaseReady = false}) async {
   sl.registerLazySingleton(() => SendPasswordReset(sl()));
   sl.registerLazySingleton(() => GetUserProfile(sl()));
   sl.registerLazySingleton(() => WatchAuthState(sl()));
+  sl.registerLazySingleton(() => SignInAnonymously(sl()));
 
   // ── Auth BLoC ─────────────────────────────────
-  sl.registerLazySingleton(() => AuthBloc(
-        signInWithEmail: sl(),
-        registerWithEmail: sl(),
-        signInWithGoogle: sl(),
-        signOut: sl(),
-        sendPasswordReset: sl(),
-        getUserProfile: sl(),
-        watchAuthState: sl(),
-      ));
+    sl.registerFactory(() => AuthBloc( 
+      signInWithEmail: sl(),
+      registerWithEmail: sl(),
+      signInWithGoogle: sl(),
+      signOut: sl(),
+      sendPasswordReset: sl(),
+      getUserProfile: sl(),
+      watchAuthState: sl(),
+      signInAnonymously: sl(),
+    ));
 
   // ── Home ──────────────────────────────────────
   sl.registerLazySingleton<HomeLocalDataSource>(() => HomeLocalDataSourceImpl());
