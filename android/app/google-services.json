@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "124516188666",
+    "project_id": "tourism-maps-cb730",
+    "storage_bucket": "tourism-maps-cb730.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:124516188666:android:707f0b1b52392e8b166443",
+        "android_client_info": {
+          "package_name": "com.example.tourism_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAVaWoh5ute4pbYuitDd5eOkop5UGfnAoo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
