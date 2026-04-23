@@ -2,30 +2,89 @@ import 'package:dartz/dartz.dart';
 import '../entities/app_user.dart';
 import '../repositories/auth_repository.dart';
 
-// ──────────────────────────────────────────────
-//  Sign In With Email
-// ──────────────────────────────────────────────
-class SignInWithEmailParams {
-  final String email;
-  final String password;
-  const SignInWithEmailParams({required this.email, required this.password});
+// 1. تعريف القاعدة الأساسية لجميع حالات الاستخدام (Base Use Case)
+abstract class UseCase<Type, Params> {
+  Future<Either<AuthFailure, Type>> call(Params params);
 }
 
-class SignInWithEmail {
+// كلاس نستخدمه عندما لا يحتاج الـ Use Case لبرامترات
+class NoParams {
+  const NoParams();
+}
+
+// ──────────────────────────────────────────────
+// 2. حالات الاستخدام (Use Cases)
+// ──────────────────────────────────────────────
+
+class SignInWithEmail implements UseCase<AppUser, SignInWithEmailParams> {
   final AuthRepository repository;
   SignInWithEmail(this.repository);
 
-  Future<Either<AuthFailure, AppUser>> call(SignInWithEmailParams params) {
-    return repository.signInWithEmailAndPassword(
+  @override
+  Future<Either<AuthFailure, AppUser>> call(SignInWithEmailParams params) async {
+    return await repository.signInWithEmailAndPassword(
       email: params.email,
       password: params.password,
     );
   }
 }
 
+class RegisterWithEmail implements UseCase<AppUser, RegisterWithEmailParams> {
+  final AuthRepository repository;
+  RegisterWithEmail(this.repository);
+
+  @override
+  Future<Either<AuthFailure, AppUser>> call(RegisterWithEmailParams params) async {
+    return await repository.createUserWithEmailAndPassword(
+      email: params.email,
+      password: params.password,
+      displayName: params.displayName,
+      role: params.role,
+      partnerInfo: params.partnerInfo,
+    );
+  }
+}
+
+class SignInWithGoogle implements UseCase<AppUser, NoParams> {
+  final AuthRepository repository;
+  SignInWithGoogle(this.repository);
+
+  @override
+  Future<Either<AuthFailure, AppUser>> call(NoParams params) async {
+    return await repository.signInWithGoogle();
+  }
+}
+
+class SignOut implements UseCase<Unit, NoParams> {
+  final AuthRepository repository;
+  SignOut(this.repository);
+
+  @override
+  Future<Either<AuthFailure, Unit>> call(NoParams params) async {
+    return await repository.signOut();
+  }
+}
+
 // ──────────────────────────────────────────────
-//  Register With Email
+// 3. حالة خاصة للـ Streams (مراقبة حالة المستخدم)
 // ──────────────────────────────────────────────
+class WatchAuthState {
+  final AuthRepository repository;
+  WatchAuthState(this.repository);
+
+  Stream<AppUser?> call() => repository.authStateChanges;
+}
+
+// ──────────────────────────────────────────────
+// 4. كلاسات المعاملات (Parameters)
+// ──────────────────────────────────────────────
+
+class SignInWithEmailParams {
+  final String email;
+  final String password;
+  const SignInWithEmailParams({required this.email, required this.password});
+}
+
 class RegisterWithEmailParams {
   final String email;
   final String password;
@@ -40,82 +99,4 @@ class RegisterWithEmailParams {
     required this.role,
     this.partnerInfo,
   });
-}
-
-class RegisterWithEmail {
-  final AuthRepository repository;
-  RegisterWithEmail(this.repository);
-
-  Future<Either<AuthFailure, AppUser>> call(RegisterWithEmailParams params) {
-    return repository.createUserWithEmailAndPassword(
-      email: params.email,
-      password: params.password,
-      displayName: params.displayName,
-      role: params.role,
-      partnerInfo: params.partnerInfo,
-    );
-  }
-}
-
-// ──────────────────────────────────────────────
-//  Sign In With Google
-// ──────────────────────────────────────────────
-class SignInWithGoogle {
-  final AuthRepository repository;
-  SignInWithGoogle(this.repository);
-
-  Future<Either<AuthFailure, AppUser>> call() {
-    return repository.signInWithGoogle();
-  }
-}
-
-// ──────────────────────────────────────────────
-//  Sign Out
-// ──────────────────────────────────────────────
-class SignOut {
-  final AuthRepository repository;
-  SignOut(this.repository);
-
-  Future<Either<AuthFailure, Unit>> call() {
-    return repository.signOut();
-  }
-}
-
-// ──────────────────────────────────────────────
-//  Send Password Reset
-// ──────────────────────────────────────────────
-class SendPasswordResetParams {
-  final String email;
-  const SendPasswordResetParams({required this.email});
-}
-
-class SendPasswordReset {
-  final AuthRepository repository;
-  SendPasswordReset(this.repository);
-
-  Future<Either<AuthFailure, Unit>> call(SendPasswordResetParams params) {
-    return repository.sendPasswordResetEmail(email: params.email);
-  }
-}
-
-// ──────────────────────────────────────────────
-//  Get User Profile
-// ──────────────────────────────────────────────
-class GetUserProfile {
-  final AuthRepository repository;
-  GetUserProfile(this.repository);
-
-  Future<Either<AuthFailure, AppUser>> call(String uid) {
-    return repository.getUserProfile(uid);
-  }
-}
-
-// ──────────────────────────────────────────────
-//  Watch Auth State
-// ──────────────────────────────────────────────
-class WatchAuthState {
-  final AuthRepository repository;
-  WatchAuthState(this.repository);
-
-  Stream<AppUser?> call() => repository.authStateChanges;
 }
