@@ -26,6 +26,7 @@ abstract class AuthRemoteDataSource {
   });
   Future<void> deleteAccount();
   User? get currentFirebaseUser;
+  Future<AppUserModel> signInAnonymously();
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -71,6 +72,23 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       'last_login_at': FieldValue.serverTimestamp(),
       'email_verified': user.emailVerified,
     });
+
+    return getUserProfile(user.uid);
+  }
+
+     @override
+  Future<AppUserModel> signInAnonymously() async {
+    final credential = await _firebaseAuth.signInAnonymously();
+    final user = credential.user!;
+
+    await _usersCollection.doc(user.uid).set({
+      'uid': user.uid,
+      'email': '',
+      'display_name': 'Guest User',
+      'role': UserRole.user.name,
+      'created_at': FieldValue.serverTimestamp(),
+      'last_login_at': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
 
     return getUserProfile(user.uid);
   }
