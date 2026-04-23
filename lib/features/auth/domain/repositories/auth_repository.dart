@@ -50,4 +50,7 @@ abstract class AuthRepository {
 
   // ── Delete account ─────────────────────────────
   Future<Either<AuthFailure, Unit>> deleteAccount();
+
+  // ── Sign In Anonymously ────────────────────────
+  Future<Either<AuthFailure, AppUser>> signInAnonymously();
 }
