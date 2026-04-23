@@ -50,21 +50,38 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     GuestSignInRequested event,
     Emitter<AuthState> emit,
   ) async {
-    emit(const AuthLoading(message: 'جاري الدخول كضيف...'));
-    
-    // استدعاء NoParams إذا كان الـ UseCase يتطلبه
+    emit(const AuthLoading(message: 'جاري الدخول كضيف...'));   
     final result = await signInAnonymously(const NoParams()); 
 
     result.fold(
       (failure) => emit(AuthError(failure.message)),
-      (user) => emit(Authenticated(user)), // استخدام Authenticated لضمان انتقال الواجهة
+      (user) => emit(Authenticated(user)), 
     );
   }
 
-  // ──────────────────────────────────────────────
-  //  بقية الدوال (Sign In, Register, etc.)
-  // ──────────────────────────────────────────────
-  
+  Future<void> _onGoogleSignIn(
+    SignInWithGoogleRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(const AuthLoading(message: 'جاري تسجيل الدخول بـ Google...'));
+    final result = await signInWithGoogle(const NoParams()); // أضفنا NoParams هنا
+    result.fold(
+      (failure) => emit(AuthError(failure.message)),
+      (user) => emit(Authenticated(user)),
+    );
+  }
+
+  Future<void> _onSignOut(
+    SignOutRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(const AuthLoading(message: 'جاري تسجيل الخروج...'));
+    final result = await signOut(const NoParams()); // أضفنا NoParams هنا
+    result.fold(
+      (failure) => emit(AuthError(failure.message)),
+      (_) => emit(const Unauthenticated()),
+    );
+  }
   Future<void> _onWatchAuthState(
     WatchAuthStateStarted event,
     Emitter<AuthState> emit,
