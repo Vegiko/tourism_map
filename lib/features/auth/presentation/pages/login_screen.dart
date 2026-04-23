@@ -211,26 +211,8 @@ class _LoginScreenState extends State<LoginScreen>
                                         ),
                               ),
                                           const SizedBox(height: 16), // مسافة بين زر جوجل وزر الضيف
+                              GuestSignInButton(isLoading: isLoading),
 
-            OutlinedButton(
-              style: OutlinedButton.styleFrom(
-                minimumSize: const Size(double.infinity, 56),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                side: BorderSide(color: AppColors.primary.withOpacity(0.4)),
-              ),
-              onPressed: isLoading 
-                ? null 
-                : () => context.read<AuthBloc>().add(const GuestSignInRequested()),
-              child: const Text(
-                'المتابعة كضيف',
-                style: TextStyle(
-                  fontFamily: 'Cairo',
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primary,
-                ),
-              ),
-            ),
                               const SizedBox(height: 16),
 
                               // Register Link
