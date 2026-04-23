@@ -117,7 +117,16 @@ class RegisterWithEmailParams {
     required this.role,
     this.partnerInfo,
   });
+}class SignInAnonymously implements UseCase<AppUser, NoParams> {
+  final AuthRepository repository;
+  SignInAnonymously(this.repository);
+
+  @override
+  Future<Either<AuthFailure, AppUser>> call(NoParams params) async {
+    return await repository.signInAnonymously();
+  }
 }
+
 class SendPasswordResetParams {
   final String email;
   const SendPasswordResetParams({required this.email});
