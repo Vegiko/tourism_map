@@ -239,17 +239,4 @@ class AuthRepositoryImpl implements AuthRepository {
       return Left(AuthFailure(message: e.toString()));
     }
   }
-    @override
-  Future<Either<AuthFailure, AppUser>> signInAnonymously() async {
-    try {
-      // نطلب العملية من الـ remoteDataSource الذي أعددناه مسبقاً
-      final user = await remoteDataSource.signInAnonymously();
-      _cachedUser = user;
-      return Right(user);
-    } on FirebaseAuthException catch (e) {
-      return Left(AuthFailure.fromFirebaseCode(e.code));
-    } catch (e) {
-      return Left(AuthFailure(message: e.toString()));
-    }
-  }
 }
