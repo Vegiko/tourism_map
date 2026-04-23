@@ -123,7 +123,7 @@ class AuthRepositoryImpl implements AuthRepository {
         uid: user.uid,
         email: '',
         displayName: 'Guest',
-        role: UserRole.user,
+        role: UserRole.customer,
         createdAt: DateTime.now(), 
       );
 
