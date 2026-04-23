@@ -56,6 +56,21 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
+    @override
+  Future<Either<AuthFailure, AppUser>> signInAnonymously() async {
+    try {
+      // نطلب من المصدر البعيد تنفيذ العملية
+      final user = await remoteDataSource.signInAnonymously();
+      _cachedUser = user;
+      return Right(user);
+    } on FirebaseAuthException catch (e) {
+      return Left(AuthFailure.fromFirebaseCode(e.code));
+    } catch (e) {
+      return Left(AuthFailure(message: e.toString()));
+    }
+  }
+
+
   // ──────────────────────────────────────────────
   //  Register
   // ──────────────────────────────────────────────
@@ -94,6 +109,32 @@ class AuthRepositoryImpl implements AuthRepository {
       AuthFailure(message: 'تسجيل الدخول بـ Google قيد التطوير'),
     );
   }
+  
+   //
+  // Sign In Anonymously
+  //
+  @override
+  Future<Either<AuthFailure, AppUser>> signInAnonymously() async {
+    try {
+      final userCredential = await _firebaseAuth.signInAnonymously();
+      final user = userCredential.user!;
+
+      final appUser = AppUser(
+        uid: user.uid,
+        email: '',
+        displayName: 'Guest',
+        role: UserRole.user,
+        createdAt: DateTime.now(), 
+      );
+
+      return Right(appUser);
+    } on FirebaseAuthException catch (e) {
+      return Left(AuthFailure.fromFirebaseCode(e.code));
+    } catch (e) {
+      return Left(AuthFailure(message: e.toString()));
+    }
+  }
+
 
   // ──────────────────────────────────────────────
   //  Sign Out
