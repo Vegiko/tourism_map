@@ -522,3 +522,33 @@ class AuthHeader extends StatelessWidget {
     );
   }
 }
+
+// أضف هذا الكود ابتداءً من السطر 526
+class GuestSignInButton extends StatelessWidget {
+  final bool isLoading;
+
+  const GuestSignInButton({super.key, required this.isLoading});
+
+  @override
+  Widget build(BuildContext context) {
+    return OutlinedButton(
+      style: OutlinedButton.styleFrom(
+        minimumSize: const Size(double.infinity, 56),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        side: BorderSide(color: AppColors.primary.withOpacity(0.4)),
+      ),
+      onPressed: isLoading 
+        ? null 
+        : () => context.read<AuthBloc>().add(const GuestSignInRequested()),
+      child: const Text(
+        'المتابعة كضيف',
+        style: TextStyle(
+          fontFamily: 'Cairo',
+          fontSize: 15,
+          fontWeight: FontWeight.w600,
+          color: AppColors.primary,
+        ),
+      ),
+    );
+  }
+}
