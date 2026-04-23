@@ -28,6 +28,12 @@ jobs:
       - name: Clean Project
         run: flutter clean
 
+- name: Get SHA1 Keys
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew signingReport
+
       - name: Build APK
         run: flutter build apk --release
 
