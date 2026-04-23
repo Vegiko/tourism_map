@@ -59,29 +59,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
   }
 
-  Future<void> _onGoogleSignIn(
-    SignInWithGoogleRequested event,
-    Emitter<AuthState> emit,
-  ) async {
-    emit(const AuthLoading(message: 'جاري تسجيل الدخول بـ Google...'));
-    final result = await signInWithGoogle(const NoParams()); // أضفنا NoParams هنا
-    result.fold(
-      (failure) => emit(AuthError(failure.message)),
-      (user) => emit(Authenticated(user)),
-    );
-  }
-
-  Future<void> _onSignOut(
-    SignOutRequested event,
-    Emitter<AuthState> emit,
-  ) async {
-    emit(const AuthLoading(message: 'جاري تسجيل الخروج...'));
-    final result = await signOut(const NoParams()); // أضفنا NoParams هنا
-    result.fold(
-      (failure) => emit(AuthError(failure.message)),
-      (_) => emit(const Unauthenticated()),
-    );
-  }
   Future<void> _onWatchAuthState(
     WatchAuthStateStarted event,
     Emitter<AuthState> emit,
