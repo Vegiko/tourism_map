@@ -242,17 +242,14 @@ class AuthRepositoryImpl implements AuthRepository {
     @override
   Future<Either<AuthFailure, AppUser>> signInAnonymously() async {
     try {
-      final userCredential = await _firebaseAuth.signInAnonymously();
-      final user = userCredential.user!;
-
-      return Right(AppUser(
-        uid: user.uid,
-        email: '',
-        displayName: 'Guest',
-        role: UserRole.user,
-      ));
+      // نطلب العملية من الـ remoteDataSource الذي أعددناه مسبقاً
+      final user = await remoteDataSource.signInAnonymously();
+      _cachedUser = user;
+      return Right(user);
+    } on FirebaseAuthException catch (e) {
+      return Left(AuthFailure.fromFirebaseCode(e.code));
     } catch (e) {
-      return Left(AuthFailure(e.toString()));
+      return Left(AuthFailure(message: e.toString()));
     }
   }
 }
