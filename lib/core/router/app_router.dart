@@ -22,6 +22,7 @@ class AppRoutes {
   static const register = '/register';
   static const forgotPassword = '/forgot-password';
   static const travelerHome = '/home';
+  static const account = '/account';
   static const partnerDashboard = '/partner';
 }
 
@@ -64,48 +65,58 @@ class AppRouterProvider extends StatelessWidget {
       redirect: (context, state) {
         final path = state.matchedLocation;
 
-        // Auth initialization
+        // ── 1. جاري التهيئة → ابقَ على Splash ──────────────────────────────
         if (authState is AuthInitial) {
           return path == AppRoutes.splash ? null : AppRoutes.splash;
         }
 
-        // Loading state
+        // ── 2. Loading → لا توجيه ────────────────────────────────────────────
         if (authState is AuthLoading) return null;
 
-        // Authenticated
-        if (authState is Authenticated || authState is RegistrationSuccess) {
-          final user = authState is Authenticated
-              ? authState.user
-              : (authState as RegistrationSuccess).user;
-
-          // Don't redirect if already on correct page
-          if (user.isPartner &&
-              path.startsWith(AppRoutes.partnerDashboard)) return null;
-          if (user.isTraveler &&
-              path.startsWith(AppRoutes.travelerHome)) return null;
-
-          // Redirect based on role
-          return user.isPartner
-              ? AppRoutes.partnerDashboard
-              : AppRoutes.travelerHome;
-        }
-
-        // Unauthenticated - redirect to role selection
-        // (لا تسمح بالبقاء على Splash)
+        // ── 3. من Splash → Home دائماً بغض النظر عن حالة المصادقة ───────────
         if (path == AppRoutes.splash) {
-          return AppRoutes.roleSelection;
+          if (authState is Authenticated || authState is RegistrationSuccess) {
+            final user = authState is Authenticated
+                ? (authState as Authenticated).user
+                : (authState as RegistrationSuccess).user;
+            return user.isPartner
+                ? AppRoutes.partnerDashboard
+                : AppRoutes.travelerHome;
+          }
+          // ضيف / غير مسجّل → Home المسافر
+          return AppRoutes.travelerHome;
         }
-        
-        final authPages = [
-          AppRoutes.roleSelection,
-          AppRoutes.login,
-          AppRoutes.register,
-          AppRoutes.forgotPassword,
-        ];
 
-        if (authPages.any((p) => path.startsWith(p))) return null;
+        // ── 4. مسجّل → حماية صفحات المصادقة (login/register/roleSelection) ──
+        if (authState is Authenticated || authState is RegistrationSuccess) {
+          final authPages = [
+            AppRoutes.roleSelection,
+            AppRoutes.login,
+            AppRoutes.register,
+          ];
+          if (authPages.any((p) => path.startsWith(p))) {
+            final user = authState is Authenticated
+                ? (authState as Authenticated).user
+                : (authState as RegistrationSuccess).user;
+            return user.isPartner
+                ? AppRoutes.partnerDashboard
+                : AppRoutes.travelerHome;
+          }
+          return null;
+        }
 
-        return AppRoutes.roleSelection;
+        // ── 5. غير مسجّل يحاول فتح Account → Login ──────────────────────────
+        if (path.startsWith(AppRoutes.account)) {
+          return AppRoutes.login;
+        }
+
+        // ── 6. غير مسجّل يحاول فتح Partner Dashboard → Home المسافر ─────────
+        if (path.startsWith(AppRoutes.partnerDashboard)) {
+          return AppRoutes.travelerHome;
+        }
+
+        // ── 7. باقي الصفحات (home, login, register...) → مسموح ───────────────
+        return null;
       },
       routes: [
         // ── Splash ──────────────────────────────
@@ -177,6 +188,22 @@ class AppRouterProvider extends StatelessWidget {
             child: const MainNavigationShell(),
             transitionsBuilder: _fadeTransition,
           ),
+        ),
+
+        // ── Account ──────────────────────────────
+        // مسجّل: يرى بياناته | غير مسجّل: يُعاد توجيهه لـ Login (عبر redirect)
+        GoRoute(
+          path: AppRoutes.account,
+          pageBuilder: (context, state) {
+            final currentState = context.read<AuthBloc>().state;
+            final user = currentState is Authenticated
+                ? currentState.user
+                : (currentState as RegistrationSuccess).user;
+            return CustomTransitionPage(
+              child: MainNavigationShell(initialAccountUser: user),
+              transitionsBuilder: _fadeTransition,
+            );
+          },
         ),
 
         // ── Partner Dashboard ────────────────────
@@ -279,12 +306,12 @@ class _AuthSplashScreenState extends State<_AuthSplashScreen>
     _ctrl.forward();
 
     // ── Timeout fallback ──────────────────────────
-    // إذا لم يستجب Firebase خلال 5 ثوانٍ، انتقل لصفحة الدخول
+    // إذا لم يستجب Firebase خلال 5 ثوانٍ، انتقل لـ Home المسافر مباشرة
     Future.delayed(const Duration(seconds: 5), () {
       if (!mounted) return;
       final authState = context.read<AuthBloc>().state;
       if (authState is AuthInitial || authState is AuthLoading) {
-        context.go(AppRoutes.roleSelection);
+        context.go(AppRoutes.travelerHome);
       }
     });
   }
