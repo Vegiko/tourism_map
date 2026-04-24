@@ -8,12 +8,9 @@ import '../models/app_user_model.dart';
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource remoteDataSource;
   AppUser? _cachedUser;
-
   AuthRepositoryImpl({required this.remoteDataSource});
-
   @override
   AppUser? get currentUser => _cachedUser;
-
   // ──────────────────────────────────────────────
   //  Auth State Stream
   // ──────────────────────────────────────────────
@@ -33,7 +30,6 @@ class AuthRepositoryImpl implements AuthRepository {
       }
     });
   }
-
   // ──────────────────────────────────────────────
   //  Sign In
   // ──────────────────────────────────────────────
@@ -55,11 +51,12 @@ class AuthRepositoryImpl implements AuthRepository {
       return Left(AuthFailure(message: e.toString()));
     }
   }
-
+  //
+  // Sign In Anonymously
+  //
     @override
   Future<Either<AuthFailure, AppUser>> signInAnonymously() async {
     try {
-      // نطلب من المصدر البعيد تنفيذ العملية
       final user = await remoteDataSource.signInAnonymously();
       _cachedUser = user;
       return Right(user);
@@ -69,8 +66,6 @@ class AuthRepositoryImpl implements AuthRepository {
       return Left(AuthFailure(message: e.toString()));
     }
   }
-
-
   // ──────────────────────────────────────────────
   //  Register
   // ──────────────────────────────────────────────
@@ -98,7 +93,6 @@ class AuthRepositoryImpl implements AuthRepository {
       return Left(AuthFailure(message: e.toString()));
     }
   }
-
   // ──────────────────────────────────────────────
   //  Google Sign In (stub - requires google_sign_in package)
   // ──────────────────────────────────────────────
@@ -109,24 +103,6 @@ class AuthRepositoryImpl implements AuthRepository {
       AuthFailure(message: 'تسجيل الدخول بـ Google قيد التطوير'),
     );
   }
-  
-   //
-  // Sign In Anonymously
-  //
-  @override
-  Future<Either<AuthFailure, AppUser>> signInAnonymously() async {
-    try {
-      final userCredential = await _firebaseAuth.signInAnonymously();
-      final user = userCredential.user!;
-
-      final appUser = AppUser(
-        uid: user.uid,
-        email: '',
-        displayName: 'Guest',
-        role: UserRole.customer,
-        createdAt: DateTime.now(), 
-      );
-
       return Right(appUser);
     } on FirebaseAuthException catch (e) {
       return Left(AuthFailure.fromFirebaseCode(e.code));
@@ -134,8 +110,6 @@ class AuthRepositoryImpl implements AuthRepository {
       return Left(AuthFailure(message: e.toString()));
     }
   }
-
-
   // ──────────────────────────────────────────────
   //  Sign Out
   // ──────────────────────────────────────────────
@@ -149,7 +123,6 @@ class AuthRepositoryImpl implements AuthRepository {
       return Left(AuthFailure(message: e.toString()));
     }
   }
-
   // ──────────────────────────────────────────────
   //  Email Verification
   // ──────────────────────────────────────────────
@@ -164,7 +137,6 @@ class AuthRepositoryImpl implements AuthRepository {
       return Left(AuthFailure(message: e.toString()));
     }
   }
-
   // ──────────────────────────────────────────────
   //  Password Reset
   // ──────────────────────────────────────────────
@@ -181,7 +153,6 @@ class AuthRepositoryImpl implements AuthRepository {
       return Left(AuthFailure(message: e.toString()));
     }
   }
-
   // ──────────────────────────────────────────────
   //  Get User Profile
   // ──────────────────────────────────────────────
@@ -197,7 +168,6 @@ class AuthRepositoryImpl implements AuthRepository {
       return Left(AuthFailure(message: e.toString()));
     }
   }
-
   // ──────────────────────────────────────────────
   //  Update Profile
   // ──────────────────────────────────────────────
