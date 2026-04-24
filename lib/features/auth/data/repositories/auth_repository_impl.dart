@@ -54,7 +54,7 @@ class AuthRepositoryImpl implements AuthRepository {
   //
   // Sign In Anonymously
   //
-    @override
+  @override
   Future<Either<AuthFailure, AppUser>> signInAnonymously() async {
     try {
       final user = await remoteDataSource.signInAnonymously();
@@ -102,13 +102,6 @@ class AuthRepositoryImpl implements AuthRepository {
     return const Left(
       AuthFailure(message: 'تسجيل الدخول بـ Google قيد التطوير'),
     );
-  }
-      return Right(appUser);
-    } on FirebaseAuthException catch (e) {
-      return Left(AuthFailure.fromFirebaseCode(e.code));
-    } catch (e) {
-      return Left(AuthFailure(message: e.toString()));
-    }
   }
   // ──────────────────────────────────────────────
   //  Sign Out

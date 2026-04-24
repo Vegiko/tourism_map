@@ -76,7 +76,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     return getUserProfile(user.uid);
   }
 
-     @override
+  @override
   Future<AppUserModel> signInAnonymously() async {
     final credential = await _firebaseAuth.signInAnonymously();
     final user = credential.user!;
@@ -85,7 +85,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       'uid': user.uid,
       'email': '',
       'display_name': 'Guest User',
-      'role': UserRole.user.name,
+      'role': UserRole.traveler.name,
       'created_at': FieldValue.serverTimestamp(),
       'last_login_at': FieldValue.serverTimestamp(),
     }, SetOptions(merge: true));
@@ -282,4 +282,8 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
 
   @override
   Future<void> deleteAccount() async {}
+
+  @override
+  Future<AppUserModel> signInAnonymously() =>
+      throw UnimplementedError('Firebase غير مُهيّأ');
 }

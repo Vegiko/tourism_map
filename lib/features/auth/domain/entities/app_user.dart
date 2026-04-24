@@ -12,6 +12,8 @@ enum UserRole {
 extension UserRoleX on UserRole {
   String get nameAr {
     switch (this) {
+      case UserRole.admin:
+        return 'مسؤول';
       case UserRole.traveler:
         return 'مسافر';
       case UserRole.partner:
@@ -21,6 +23,8 @@ extension UserRoleX on UserRole {
 
   String get nameEn {
     switch (this) {
+      case UserRole.admin:
+        return 'Admin';
       case UserRole.traveler:
         return 'Traveler';
       case UserRole.partner:
@@ -30,6 +34,8 @@ extension UserRoleX on UserRole {
 
   String get descriptionAr {
     switch (this) {
+      case UserRole.admin:
+        return 'إدارة النظام والمستخدمين';
       case UserRole.traveler:
         return 'ابحث عن وجهات رائعة واحجز رحلاتك بسهولة';
       case UserRole.partner:
@@ -39,6 +45,8 @@ extension UserRoleX on UserRole {
 
   String get descriptionEn {
     switch (this) {
+      case UserRole.admin:
+        return 'Manage system and users';
       case UserRole.traveler:
         return 'Discover amazing destinations and book trips easily';
       case UserRole.partner:
@@ -48,6 +56,8 @@ extension UserRoleX on UserRole {
 
   static UserRole fromString(String value) {
     switch (value.toLowerCase()) {
+      case 'admin':
+        return UserRole.admin;
       case 'partner':
         return UserRole.partner;
       default:
@@ -135,7 +145,8 @@ class AppUser extends Equatable {
     this.savedDestinations = const [],
     this.partnerInfo,
   });
-@override
+  
+  @override
   List<Object?> get props => [
         uid,
         email,
@@ -149,10 +160,10 @@ class AppUser extends Equatable {
         savedDestinations,
         partnerInfo,
       ];
+  
   bool get isPartner => role == UserRole.partner;
   bool get isTraveler => role == UserRole.traveler;
   bool get isAdmin => role == UserRole.admin;
-
 
   AppUser copyWith({
     String? displayName,
@@ -177,9 +188,6 @@ class AppUser extends Equatable {
       partnerInfo: partnerInfo ?? this.partnerInfo,
     );
   }
-
-  @override
-  List<Object?> get props => [uid, email, role, emailVerified];
 }
 
 // ──────────────────────────────────────────────────────────────
