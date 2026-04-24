@@ -771,6 +771,22 @@ class FeaturedCardSkeleton extends StatelessWidget {
   }
 }
 
+class MainNavigationShell extends StatelessWidget {
+  final AppUser? initialAccountUser; // أضف هذا الحقل
+
+  const MainNavigationShell({
+    super.key,
+    this.initialAccountUser, // أضفه هنا في الـ Constructor
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    // الآن يمكنك استخدام initialAccountUser هنا إذا كنت تحتاجه
+    return Scaffold(
+    );
+  }
+}
+
 class PopularCardSkeleton extends StatelessWidget {
   const PopularCardSkeleton({super.key});
 
