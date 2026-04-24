@@ -4,6 +4,7 @@ import 'package:equatable/equatable.dart';
 //  UserRole Enum
 // ──────────────────────────────────────────────────────────────
 enum UserRole {
+  admin,
   traveler,  // مسافر
   partner,   // شريك (فندق / وكالة)
 }
@@ -134,9 +135,24 @@ class AppUser extends Equatable {
     this.savedDestinations = const [],
     this.partnerInfo,
   });
-
+@override
+  List<Object?> get props => [
+        uid,
+        email,
+        displayName,
+        photoUrl,
+        role,
+        emailVerified,
+        createdAt,
+        lastLoginAt,
+        tripsCount,
+        savedDestinations,
+        partnerInfo,
+      ];
   bool get isPartner => role == UserRole.partner;
   bool get isTraveler => role == UserRole.traveler;
+  bool get isAdmin => role == UserRole.admin;
+
 
   AppUser copyWith({
     String? displayName,
