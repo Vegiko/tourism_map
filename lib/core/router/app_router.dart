@@ -185,7 +185,7 @@ class AppRouterProvider extends StatelessWidget {
         GoRoute(
           path: AppRoutes.travelerHome,
           pageBuilder: (context, state) => CustomTransitionPage(
-            child: const MainNavigationShell(),
+            child: MainNavigationShell(child: Container()),
             transitionsBuilder: _fadeTransition,
           ),
         ),
@@ -200,7 +200,10 @@ class AppRouterProvider extends StatelessWidget {
                 ? currentState.user
                 : (currentState as RegistrationSuccess).user;
             return CustomTransitionPage(
-              child: MainNavigationShell(initialAccountUser: user),
+              child: MainNavigationShell(
+                  initialAccountUser: user,
+                  child: const AccountPage(),  
+                ),
               transitionsBuilder: _fadeTransition,
             );
           },
